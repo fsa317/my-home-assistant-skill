@@ -2,7 +2,7 @@
 Extends home assistant integration
 
 ## About
-
+test
 
 ## Examples
 * "What is the house status"
