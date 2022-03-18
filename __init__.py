@@ -2,14 +2,16 @@ from mycroft import MycroftSkill, intent_file_handler
 from mycroft.util.log import getLogger
 from requests import get, post
 
+
 # Timeout time for HA requests
 TIMEOUT = 10
 
 class MyHomeAssistant(MycroftSkill):
     def __init__(self):
         MycroftSkill.__init__(self)
-        token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhZjA1NmY5Mzc4NTI0NWY4YmUzYTUwMGMzYzgxNGY0NCIsImlhdCI6MTYwODUyMjQ4MCwiZXhwIjoxOTIzODgyNDgwfQ.CXEuvGcKw6ZkDohYvYqkXYDz0Ja4d7gMyDzxgqncRfU"
-        self.ha_url = 'https://fulton.duckdns.org'
+        token = self.settings.get('hasecret')
+        self.ha_url = self.settings.get('hahost')
+        self.log.info("Starting MyHomeAssistant v0.11")
         self.headers = {
             'Authorization': "Bearer {}".format(token),
             'Content-Type': 'application/json'
@@ -18,6 +20,11 @@ class MyHomeAssistant(MycroftSkill):
     @intent_file_handler('home.status.intent')
     def handle_home_status_intent(self, message):
         #self.speak_dialog('assistant.home.my')
+        resp = self.getState('sensor.jarvis_temps')
+        self.speak(resp)
+    
+    @intent_file_handler('temp.check.intent')
+    def handle_temp_check_intent(self, message):
         resp = self.getState('sensor.jarvis_temps')
         self.speak(resp)
     
