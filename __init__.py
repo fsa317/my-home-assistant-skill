@@ -47,6 +47,35 @@ class MyHomeAssistant(MycroftSkill):
         resp = self.getState('sensor.jarvis_'+pers+'_status')
         self.speak(resp)
     
+    @intent_file_handler('energy.intent')
+    def handle_energy_intent(self, message):
+        self.log.info("energy intent")
+        solarnow = self.getState('sensor.powerwall_solar_now')
+        gridnow = float(self.getState('sensor.powerwall_site_now'))
+        net7 = float(self.getState('sensor.net_usage_7d'))
+        net30 = float(self.getState('sensor.net_usage_30d'))
+        
+        ha_data = {'value': solarnow} 
+        self.speak_dialog('solar',data=ha_data)
+        
+        ha_data = {'value': abs(gridnow)}
+        if (gridnow>0):
+            self.speak_dialog('gridnow.deficit',data=ha_data)
+        else:
+            self.speak_dialog('gridnow.surplus',data=ha_data)
+        
+        ha_data = {'value': abs(net7), 'days':7}
+        if (net7>0):
+            self.speak_dialog('grid.deficit',data=ha_data)
+        else:
+            self.speak_dialog('grid.surplus',data=ha_data)
+        
+        ha_data = {'value': abs(net30), 'days':30}
+        if (net30>0):
+            self.speak_dialog('grid.deficit',data=ha_data)
+        else:
+            self.speak_dialog('grid.surplus',data=ha_data)
+    
     def getState(self,entity):
         response = self.callApi('/states/{}'.format(entity))
         if response:
